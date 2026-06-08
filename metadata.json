@@ -1,0 +1,8 @@
+{
+  "name": "Academic Brainstorm OS",
+  "description": "An AI Studio academic co-creator with Gemini model selection, persistent history, language/personality settings, and file/voice input.",
+  "requestFramePermissions": [
+    "microphone"
+  ],
+  "majorCapabilities": []
+}

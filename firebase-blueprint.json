@@ -1,0 +1,62 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile information",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string" },
+        "role": { "type": "string", "enum": ["student", "parent", "teacher", "guest"] },
+        "grade": { "type": "string", "enum": ["G10", "G11", "G12", "G13", "none"] },
+        "createdAt": { "type": "number" },
+        "updatedAt": { "type": "number" }
+      },
+      "required": ["uid", "role", "grade", "createdAt", "updatedAt"]
+    },
+    "StudyProgress": {
+      "title": "Study Progress",
+      "description": "Progress tracking for a specific subject",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "subject": { "type": "string" },
+        "examDate": { "type": "string" },
+        "checkInDays": { "type": "number" },
+        "ongoingTasks": { "type": "number" },
+        "avgScore": { "type": "number" },
+        "dagPlan": { "type": "string" },
+        "gateStatus": { "type": "string" },
+        "systemStatus": { "type": "string" },
+        "updatedAt": { "type": "number" }
+      },
+      "required": ["userId", "subject", "updatedAt"]
+    },
+    "ChatSession": {
+       "title": "Chat Session",
+       "description": "A chat session containing history",
+       "type": "object",
+       "properties": {
+         "userId": { "type": "string" },
+         "title": { "type": "string" },
+         "updatedAt": { "type": "number" },
+         "personality": { "type": "string" }
+       },
+       "required": ["userId", "title", "updatedAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/User" },
+      "description": "User profiles"
+    },
+    "/users/{userId}/study_progress/{progressId}": {
+      "schema": { "$ref": "#/entities/StudyProgress" },
+      "description": "User study progress tracker"
+    },
+    "/users/{userId}/sessions/{sessionId}": {
+      "schema": { "$ref": "#/entities/ChatSession" },
+      "description": "User chat sessions"
+    }
+  }
+}

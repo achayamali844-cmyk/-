@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: academic-brainstorm-os-study
+    runtime: node
+    buildCommand: npm ci && npm run build
+    startCommand: npm run start
+    healthCheckPath: /
+    domains:
+      - study.wo.weworld.games
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: APP_URL
+        value: https://study.wo.weworld.games
+      - key: GEMINI_API_KEY
+        sync: false

@@ -1,0 +1,90 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 0. Global Safety Net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Primitives
+    function isSignedIn() { return request.auth != null; }
+    function isValidId(id) { return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$'); }
+    function incoming() { return request.resource.data; }
+    function existing() { return resource.data; }
+
+    // Validation Blueprints
+    function isValidUser(data) {
+      return data.keys().hasAll(['uid', 'role', 'grade', 'createdAt', 'updatedAt'])
+        && data.uid is string && data.uid.size() <= 128 && data.uid == request.auth.uid
+        && data.role is string && (data.role == 'student' || data.role == 'parent' || data.role == 'teacher' || data.role == 'guest')
+        && data.grade is string && (data.grade == 'G10' || data.grade == 'G11' || data.grade == 'G12' || data.grade == 'G13' || data.grade == 'none')
+        && data.createdAt is number
+        && data.updatedAt is number;
+    }
+
+    function isValidStudyProgress(data, userId) {
+      return data.keys().hasAll(['userId', 'subject', 'updatedAt'])
+        && data.userId is string && data.userId == userId && data.userId == request.auth.uid
+        && data.subject is string && data.subject.size() <= 100
+        && data.updatedAt is number
+        && (!data.keys().hasAny(['examDate']) || (data.examDate is string && data.examDate.size() <= 50))
+        && (!data.keys().hasAny(['checkInDays']) || data.checkInDays is number)
+        && (!data.keys().hasAny(['ongoingTasks']) || data.ongoingTasks is number)
+        && (!data.keys().hasAny(['avgScore']) || data.avgScore is number)
+        && (!data.keys().hasAny(['dagPlan']) || (data.dagPlan is string && data.dagPlan.size() <= 5000))
+        && (!data.keys().hasAny(['gateStatus']) || (data.gateStatus is string && data.gateStatus.size() <= 100))
+        && (!data.keys().hasAny(['systemStatus']) || (data.systemStatus is string && data.systemStatus.size() <= 100));
+    }
+    
+    function isValidChatSession(data, userId) {
+      return data.keys().hasAll(['userId', 'title', 'updatedAt'])
+        && data.userId is string && data.userId == userId && data.userId == request.auth.uid
+        && data.title is string && data.title.size() <= 200
+        && data.updatedAt is number
+        && (!data.keys().hasAny(['personality']) || (data.personality is string && data.personality.size() <= 50));
+    }
+
+    // Paths
+    match /users/{userId} {
+      allow get: if isSignedIn() && isValidId(userId) && request.auth.uid == userId;
+      allow list: if isSignedIn() && request.auth.uid == userId;
+      allow create: if isSignedIn() && isValidId(userId) && request.auth.uid == userId
+                    && isValidUser(incoming())
+                    && incoming().keys().size() <= 10;
+      allow update: if isSignedIn() && isValidId(userId) && request.auth.uid == userId
+                    && isValidUser(incoming())
+                    && incoming().diff(existing()).affectedKeys().hasOnly(['role', 'grade', 'updatedAt'])
+                    && incoming().uid == existing().uid
+                    && incoming().createdAt == existing().createdAt;
+      allow delete: if isSignedIn() && isValidId(userId) && request.auth.uid == userId;
+
+      match /study_progress/{progressId} {
+        allow get: if isSignedIn() && isValidId(userId) && request.auth.uid == userId && isValidId(progressId);
+        allow list: if isSignedIn() && isValidId(userId) && request.auth.uid == userId;
+        allow create: if isSignedIn() && isValidId(userId) && request.auth.uid == userId && isValidId(progressId)
+                      && isValidStudyProgress(incoming(), userId)
+                      && incoming().keys().size() <= 12;
+        allow update: if isSignedIn() && isValidId(userId) && request.auth.uid == userId && isValidId(progressId)
+                      && isValidStudyProgress(incoming(), userId)
+                      && incoming().diff(existing()).affectedKeys().hasOnly(['examDate', 'checkInDays', 'ongoingTasks', 'avgScore', 'dagPlan', 'gateStatus', 'systemStatus', 'updatedAt'])
+                      && incoming().userId == existing().userId
+                      && incoming().subject == existing().subject;
+        allow delete: if isSignedIn() && isValidId(userId) && request.auth.uid == userId && isValidId(progressId);
+      }
+
+      match /sessions/{sessionId} {
+        allow get: if isSignedIn() && isValidId(userId) && request.auth.uid == userId && isValidId(sessionId);
+        allow list: if isSignedIn() && isValidId(userId) && request.auth.uid == userId;
+        allow create: if isSignedIn() && isValidId(userId) && request.auth.uid == userId && isValidId(sessionId)
+                      && isValidChatSession(incoming(), userId)
+                      && incoming().keys().size() <= 5;
+        allow update: if isSignedIn() && isValidId(userId) && request.auth.uid == userId && isValidId(sessionId)
+                      && isValidChatSession(incoming(), userId)
+                      && incoming().diff(existing()).affectedKeys().hasOnly(['title', 'personality', 'updatedAt'])
+                      && incoming().userId == existing().userId;
+        allow delete: if isSignedIn() && isValidId(userId) && request.auth.uid == userId && isValidId(sessionId);
+      }
+    }
+  }
+}
