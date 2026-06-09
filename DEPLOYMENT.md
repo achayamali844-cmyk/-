@@ -2,57 +2,62 @@
 
 这个项目不能直接把域名指向本机的 `localhost:3000`。正确流程是先部署到公网托管平台，再把域名 DNS 指向平台给出的地址。
 
-## 推荐路线：Render Web Service
+## 推荐路线：Vercel
 
-这个项目是 React + Vite + Express，包含 `/api/notion/sync` 服务端接口，所以推荐用 Web Service，而不是纯静态站点。
+当前项目已适配 Vercel：前端使用 Vite 静态构建，后端接口位于 `api/` Serverless Functions。
 
-1. 把项目上传到 GitHub。
-2. 在 Render 新建 Web Service 或 Blueprint，选择这个 GitHub 仓库。
-3. 如果不用 Blueprint，手动设置构建和启动命令：
+1. 把项目推送到 GitHub。
+2. 在 Vercel 新建 Project，导入这个 GitHub 仓库。
+3. Vercel 设置：
 
-```bash
-npm ci && npm run build
+```text
+Framework Preset: Vite
+Build Command: npm run build
+Output Directory: dist
+Install Command: npm ci
 ```
 
-```bash
-npm run start
-```
-
-4. 在 Render 的 Environment Variables 配置：
+4. 在 Vercel Environment Variables 配置：
 
 ```env
 GEMINI_API_KEY=你的 Gemini API Key
+APP_URL=https://study.wo.weworld.games
 NOTION_API_KEY=你的 Notion Token，可选
 NOTION_DATABASE_ID=你的 Notion Database ID，可选
-APP_URL=https://study.wo.weworld.games
 ```
 
-5. 先打开 Render 给你的 `onrender.com` 地址，确认页面能访问。
-6. 在 Render 服务的 Custom Domains 里添加你的域名，例如：
+5. 先打开 Vercel 给你的 `vercel.app` 地址，确认页面能访问。
+6. 在 Vercel 项目 Settings -> Domains 添加：
 
 ```text
 study.wo.weworld.games
 ```
 
-7. 回到域名 DNS 管理后台，按 Render 页面提示添加 `CNAME` 或 `A` 记录。
+7. 把 Vercel 页面显示的 DNS 记录交给域名管理员。
 
-常见子域名配置：
+常见子域名配置如下，但最终以 Vercel 页面显示为准：
 
 ```text
 类型: CNAME
 名称: study.wo
-值: Render 提供的目标地址
+值: cname.vercel-dns.com
 ```
 
-常见根域名配置：
+DNS 生效通常需要几分钟到 24 小时。SSL 证书由 Vercel 自动签发。
 
-```text
-类型: A 或 ALIAS/ANAME
-名称: @
-值: Render 提供的目标地址
+## 备用路线：Render Web Service
+
+如果后续仍要用 Render，可以使用项目中的 [render.yaml](./render.yaml)。Render 构建命令应使用：
+
+```bash
+npm ci && npm run build:server
 ```
 
-DNS 生效通常需要几分钟到 24 小时。SSL 证书一般由托管平台自动签发。
+启动命令：
+
+```bash
+npm run start
+```
 
 ## Google Cloud Run 路线
 
@@ -72,9 +77,10 @@ APP_URL=https://你的域名
 要真正帮你完成域名绑定，我还需要你告诉我：
 
 ```text
-1. Render 服务创建后的 onrender.com URL
-2. Render Custom Domain 页面显示的 CNAME target
-3. 域名管理员是否管理 weworld.games 根域，还是只管理 wo.weworld.games 子区
+1. Vercel 项目创建后的 vercel.app URL
+2. Vercel Domains 页面显示的 CNAME target
+3. 是否显示了 TXT verification 记录
+4. 域名管理员是否管理 weworld.games 根域，还是只管理 wo.weworld.games 子区
 ```
 
 不要把 `GEMINI_API_KEY`、域名账号密码或支付信息发在聊天里。密钥只应该填到托管平台的 Environment Variables / Secrets 面板。

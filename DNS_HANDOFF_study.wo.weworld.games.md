@@ -2,9 +2,8 @@
 
 ## 部署平台
 
-- 平台名称：Render Web Service
-- 项目服务名：academic-brainstorm-os-study
-- 项目部署 URL：部署创建后由 Render 分配，预期格式为 `https://academic-brainstorm-os-study.onrender.com`
+- 平台名称：Vercel
+- 项目部署 URL：Vercel 首次部署后生成，格式通常类似 `https://<project-name>-<team>.vercel.app`。最终请以 Vercel Dashboard 显示为准。
 - 自定义域名：`study.wo.weworld.games`
 
 ## DNS Record
@@ -14,20 +13,20 @@
 | DNS record type | `CNAME` |
 | Name / Host | `study.wo`（如果 DNS 面板当前管理的是 `weworld.games`） |
 | Name / Host | `study`（如果 DNS 面板当前管理的是 `wo.weworld.games`） |
-| Value / Target | Render 服务的 `onrender.com` 子域名，例如 `academic-brainstorm-os-study.onrender.com` |
-| 是否需要 TXT 验证 | 通常不需要。普通单一子域名一般只需要 CNAME；如果 Render Dashboard 额外显示 TXT 验证，请按 Render 显示值追加。 |
-| 是否要求 Cloudflare Proxy | 不要求。初次验证必须使用 DNS only / 灰云；证书签发完成后才可考虑开启代理。 |
+| Value / Target | 先以 Vercel Dashboard 给出的值为准；常见值是 `cname.vercel-dns.com` 或项目专属 `*.vercel-dns-*.com` |
+| 是否需要 TXT 验证 | 只有当 Vercel 页面提示 Domain Verification / TXT record 时才需要。若出现，请添加 Vercel 给出的 `_vercel` TXT 记录和值。 |
+| 是否要求 Cloudflare Proxy | 不要求。首次验证建议关闭 Cloudflare Proxy，使用 DNS only / 灰云；验证成功后再按管理员策略决定是否开启。 |
 
 ## 验证步骤
 
-1. 在 Render Dashboard 创建 Web Service，并确认 `https://academic-brainstorm-os-study.onrender.com` 或 Render 实际分配的 URL 能打开。
-2. 在 Render 服务的 Custom Domains 添加：`study.wo.weworld.games`。
-3. 将 Render 显示的 CNAME Target 发给域名管理员；管理员添加上方 CNAME 记录。
-4. 如果域名使用 Cloudflare，Proxy status 先设置为 DNS only / 灰云。
-5. 等待 DNS 生效后，在 Render Custom Domains 点击 Verify。
-6. Render 显示 Verified / Certificate Issued 后，访问 `https://study.wo.weworld.games`。
-7. 如果出现 502，等待几分钟后重试；如果一直失败，检查 Render 服务日志和 DNS CNAME 是否指向正确的 `onrender.com` 域名。
+1. 在 Vercel 创建项目并确认默认 `vercel.app` 域名可打开。
+2. 在 Vercel 项目设置里添加自定义域名：`study.wo.weworld.games`。
+3. 复制 Vercel 显示的 DNS 记录，发给域名管理员。
+4. 管理员添加 CNAME；如果 Vercel 额外要求 TXT 验证，也一起添加。
+5. 等待 DNS 生效后，回到 Vercel 点击 Verify / Refresh / Check DNS。
+6. Vercel 显示 Valid Configuration 且证书签发后，访问 `https://study.wo.weworld.games`。
+7. 如果失败，检查是否有旧 CNAME/A 记录冲突、Cloudflare Proxy 是否影响验证、以及域名是否已被其他 Vercel 项目占用。
 
 ## 给管理员的一句话
 
-请为 `study.wo.weworld.games` 添加一条 CNAME 到 Render 服务的 `onrender.com` 地址。不要改 `weworld.games` 或 `wo.weworld.games` 的现有主站、API、数据库、Tunnel 或环境变量。
+请只为 `study.wo.weworld.games` 添加 Vercel 要求的 CNAME/TXT 记录。不要改 `weworld.games` 或 `wo.weworld.games` 的现有主站、API、数据库、Tunnel 或环境变量。

@@ -55,7 +55,7 @@ http://localhost:3000
 
 详细步骤见：[DEPLOYMENT.md](./DEPLOYMENT.md)。
 
-本项目已提供 Render Blueprint：[render.yaml](./render.yaml)。当前目标自定义域名是：
+当前推荐使用 Vercel。项目已提供 Vercel 配置：[vercel.json](./vercel.json)。当前目标自定义域名是：
 
 ```text
 study.wo.weworld.games
@@ -68,6 +68,13 @@ study.wo.weworld.games
 ```bash
 npm run lint
 npm run build
+```
+
+本地验证 Express 生产服务时使用：
+
+```bash
+npm run build:server
+npm run start
 ```
 
 不需要真实 `GEMINI_API_KEY` 的验证：
