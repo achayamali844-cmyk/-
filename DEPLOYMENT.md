@@ -2,22 +2,22 @@
 
 这个项目不能直接把域名指向本机的 `localhost:3000`。正确流程是先部署到公网托管平台，再把域名 DNS 指向平台给出的地址。
 
-## 推荐路线：Vercel
+## 推荐路线：Netlify
 
-当前项目已适配 Vercel：前端使用 Vite 静态构建，后端接口位于 `api/` Serverless Functions。
+当前项目已适配 Netlify：前端使用 Vite 静态构建，后端接口位于 `netlify/functions/`，并通过 `netlify.toml` 把 `/api/...` 请求转发到 Netlify Functions。
 
 1. 把项目推送到 GitHub。
-2. 在 Vercel 新建 Project，导入这个 GitHub 仓库。
-3. Vercel 设置：
+2. 在 Netlify 新建 Project，选择 GitHub 导入这个仓库。
+3. Netlify 设置：
 
 ```text
 Framework Preset: Vite
 Build Command: npm run build
-Output Directory: dist
+Publish directory: dist
 Install Command: npm ci
 ```
 
-4. 在 Vercel Environment Variables 配置：
+4. 在 Netlify Environment variables 配置：
 
 ```env
 GEMINI_API_KEY=你的 Gemini API Key
@@ -26,24 +26,35 @@ NOTION_API_KEY=你的 Notion Token，可选
 NOTION_DATABASE_ID=你的 Notion Database ID，可选
 ```
 
-5. 先打开 Vercel 给你的 `vercel.app` 地址，确认页面能访问。
-6. 在 Vercel 项目 Settings -> Domains 添加：
+5. 先打开 Netlify 给你的 `netlify.app` 地址，确认页面能访问。
+6. 在 Netlify 项目的 Domain management 添加：
 
 ```text
 study.wo.weworld.games
 ```
 
-7. 把 Vercel 页面显示的 DNS 记录交给域名管理员。
+7. 把 Netlify 页面显示的 DNS 记录交给域名管理员。
 
-常见子域名配置如下，但最终以 Vercel 页面显示为准：
+常见子域名配置如下，但最终以 Netlify 页面显示为准：
 
 ```text
 类型: CNAME
 名称: study.wo
-值: cname.vercel-dns.com
+值: <你的站点名>.netlify.app
 ```
 
-DNS 生效通常需要几分钟到 24 小时。SSL 证书由 Vercel 自动签发。
+DNS 生效通常需要几分钟到 48 小时。SSL 证书由 Netlify 自动签发。
+
+## 备用路线：Vercel
+
+如果 Vercel 账号审核通过，也可以使用项目中的 [vercel.json](./vercel.json)。Vercel 设置为：
+
+```text
+Framework Preset: Vite
+Build Command: npm run build
+Output Directory: dist
+Install Command: npm ci
+```
 
 ## 备用路线：Render Web Service
 
@@ -77,8 +88,8 @@ APP_URL=https://你的域名
 要真正帮你完成域名绑定，我还需要你告诉我：
 
 ```text
-1. Vercel 项目创建后的 vercel.app URL
-2. Vercel Domains 页面显示的 CNAME target
+1. Netlify 项目创建后的 netlify.app URL
+2. Netlify Domain management 页面显示的 CNAME target
 3. 是否显示了 TXT verification 记录
 4. 域名管理员是否管理 weworld.games 根域，还是只管理 wo.weworld.games 子区
 ```

@@ -1,0 +1,36 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+  functions = "netlify/functions"
+
+[functions]
+  node_bundler = "esbuild"
+
+[[redirects]]
+  from = "/api/ai/chat-stream"
+  to = "/.netlify/functions/ai-chat-stream"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/ai/extract-tasks"
+  to = "/.netlify/functions/ai-extract-tasks"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/ai/verify-check-in"
+  to = "/.netlify/functions/ai-verify-check-in"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/notion/sync"
+  to = "/.netlify/functions/notion-sync"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

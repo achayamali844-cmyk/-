@@ -15,7 +15,7 @@ https://ai.studio/apps/7f7ea154-7792-4246-b785-f90d46ac5a43
 
 ## Google AI Studio 配置
 
-在 AI Studio 或部署平台的 Secrets / Environment Variables 面板配置 `GEMINI_API_KEY`。当前版本的 Gemini 调用走项目内置 Express API，密钥只应存在于服务端环境变量中，不应写进前端代码或公开仓库。
+在 AI Studio 或部署平台的 Secrets / Environment Variables 面板配置 `GEMINI_API_KEY`。当前版本的 Gemini 调用走服务端 API，密钥只应存在于服务端环境变量中，不应写进前端代码或公开仓库。
 
 ```env
 GEMINI_API_KEY="你的 Gemini API Key"
@@ -51,11 +51,11 @@ http://localhost:3000
 
 ## 部署和绑定域名
 
-公网域名不能直接指向本机 `localhost:3000`。先把项目部署到 Render、Cloud Run 等公网平台，再按平台提示添加 DNS 记录。
+公网域名不能直接指向本机 `localhost:3000`。先把项目部署到 Netlify 等公网平台，再按平台提示添加 DNS 记录。
 
 详细步骤见：[DEPLOYMENT.md](./DEPLOYMENT.md)。
 
-当前推荐使用 Vercel。项目已提供 Vercel 配置：[vercel.json](./vercel.json)。当前目标自定义域名是：
+当前推荐使用 Netlify。项目已提供 Netlify 配置：[netlify.toml](./netlify.toml)，其中包含 Vite 静态构建、Netlify Functions API 路由和 SPA fallback。当前目标自定义域名是：
 
 ```text
 study.wo.weworld.games
