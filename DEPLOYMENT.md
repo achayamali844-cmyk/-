@@ -2,22 +2,21 @@
 
 这个项目不能直接把域名指向本机的 `localhost:3000`。正确流程是先部署到公网托管平台，再把域名 DNS 指向平台给出的地址。
 
-## 推荐路线：Netlify
+## 推荐路线：Cloudflare Pages
 
-当前项目已适配 Netlify：前端使用 Vite 静态构建，后端接口位于 `netlify/functions/`，并通过 `netlify.toml` 把 `/api/...` 请求转发到 Netlify Functions。
+当前项目已适配 Cloudflare Pages：前端使用 Vite 静态构建，后端接口位于 `functions/`，`/api/...` 会由 Cloudflare Pages Functions 处理，`public/_redirects` 用于 SPA 页面回退。
 
 1. 把项目推送到 GitHub。
-2. 在 Netlify 新建 Project，选择 GitHub 导入这个仓库。
-3. Netlify 设置：
+2. 在 Cloudflare Dashboard 进入 Workers & Pages，创建 Pages 项目，选择 GitHub 导入这个仓库。
+3. Cloudflare Pages 设置：
 
 ```text
-Framework Preset: Vite
+Framework preset: Vite
 Build Command: npm run build
-Publish directory: dist
-Install Command: npm ci
+Build output directory: dist
 ```
 
-4. 在 Netlify Environment variables 配置：
+4. 在 Cloudflare Pages Environment variables 配置：
 
 ```env
 GEMINI_API_KEY=你的 Gemini API Key
@@ -26,24 +25,33 @@ NOTION_API_KEY=你的 Notion Token，可选
 NOTION_DATABASE_ID=你的 Notion Database ID，可选
 ```
 
-5. 先打开 Netlify 给你的 `netlify.app` 地址，确认页面能访问。
-6. 在 Netlify 项目的 Domain management 添加：
+5. 先打开 Cloudflare 给你的 `pages.dev` 地址，确认页面能访问。
+6. 在 Cloudflare Pages 项目的 Custom domains 添加：
 
 ```text
 study.wo.weworld.games
 ```
 
-7. 把 Netlify 页面显示的 DNS 记录交给域名管理员。
+7. 把 Cloudflare Pages 页面显示的 DNS 记录交给域名管理员。
 
-常见子域名配置如下，但最终以 Netlify 页面显示为准：
+常见子域名配置如下，但最终以 Cloudflare Pages 页面显示为准：
 
 ```text
 类型: CNAME
 名称: study.wo
-值: <你的站点名>.netlify.app
+值: <你的项目名>.pages.dev
 ```
 
-DNS 生效通常需要几分钟到 48 小时。SSL 证书由 Netlify 自动签发。
+DNS 生效通常需要几分钟到 48 小时。SSL 证书由 Cloudflare 自动签发。
+
+## 备用路线：Netlify
+
+如果 Netlify 账号恢复，也可以使用项目中的 [netlify.toml](./netlify.toml)。Netlify 设置为：
+
+```text
+Build command: npm run build
+Publish directory: dist
+```
 
 ## 备用路线：Vercel
 
@@ -88,8 +96,8 @@ APP_URL=https://你的域名
 要真正帮你完成域名绑定，我还需要你告诉我：
 
 ```text
-1. Netlify 项目创建后的 netlify.app URL
-2. Netlify Domain management 页面显示的 CNAME target
+1. Cloudflare Pages 项目创建后的 pages.dev URL
+2. Cloudflare Pages Custom domains 页面显示的 CNAME target
 3. 是否显示了 TXT verification 记录
 4. 域名管理员是否管理 weworld.games 根域，还是只管理 wo.weworld.games 子区
 ```

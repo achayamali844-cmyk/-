@@ -51,11 +51,11 @@ http://localhost:3000
 
 ## 部署和绑定域名
 
-公网域名不能直接指向本机 `localhost:3000`。先把项目部署到 Netlify 等公网平台，再按平台提示添加 DNS 记录。
+公网域名不能直接指向本机 `localhost:3000`。先把项目部署到 Cloudflare Pages 等公网平台，再按平台提示添加 DNS 记录。
 
 详细步骤见：[DEPLOYMENT.md](./DEPLOYMENT.md)。
 
-当前推荐使用 Netlify。项目已提供 Netlify 配置：[netlify.toml](./netlify.toml)，其中包含 Vite 静态构建、Netlify Functions API 路由和 SPA fallback。当前目标自定义域名是：
+当前推荐使用 Cloudflare Pages。项目已提供 Cloudflare Pages Functions 目录：[functions](./functions)，并通过 [public/_redirects](./public/_redirects) 支持 SPA fallback。当前目标自定义域名是：
 
 ```text
 study.wo.weworld.games

@@ -12,12 +12,28 @@ const GEMINI_API_KEY_PLACEHOLDER = "MY_GEMINI_API_KEY";
 const MISSING_KEY_MESSAGE = "GEMINI_API_KEY is missing. Configure it in your deployment environment variables or .env.local.";
 
 type GeminiPart = { text: string } | { inlineData: { mimeType: string; data: string } };
+type ServerRuntimeEnv = Record<string, unknown>;
 
 let aiClient: GoogleGenAI | null = null;
+let aiClientApiKey = "";
+let serverRuntimeEnv: ServerRuntimeEnv = {};
+
+export function setServerRuntimeEnv(env: ServerRuntimeEnv = {}) {
+  serverRuntimeEnv = env;
+}
+
+function getRuntimeEnvValue(name: string): string {
+  const injectedValue = serverRuntimeEnv[name];
+  if (typeof injectedValue === "string" && injectedValue.trim()) {
+    return injectedValue.trim();
+  }
+
+  const processValue = typeof process !== "undefined" ? process.env?.[name] : undefined;
+  return typeof processValue === "string" ? processValue.trim() : "";
+}
 
 function getGeminiApiKey(): string {
-  const key = process.env.GEMINI_API_KEY;
-  return typeof key === "string" ? key.trim() : "";
+  return getRuntimeEnvValue("GEMINI_API_KEY");
 }
 
 function getAiClient(): GoogleGenAI {
@@ -26,8 +42,9 @@ function getAiClient(): GoogleGenAI {
     throw new Error(MISSING_KEY_MESSAGE);
   }
 
-  if (!aiClient) {
+  if (!aiClient || aiClientApiKey !== apiKey) {
     aiClient = new GoogleGenAI({ apiKey });
+    aiClientApiKey = apiKey;
   }
   return aiClient;
 }
